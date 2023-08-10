@@ -12,6 +12,15 @@ export class BaseModel extends Model {
 
     QueryBuilderType!: CustomQueryBuilder<this>;
     static QueryBuilder = CustomQueryBuilder;
+    
+    static queryBuilder(query: any) {
+        const request = (global as any).requestContext;
+        if(request?.tenant){
+            query.withSchema(request?.tenant)
+        }else{
+            query.withSchema('public')
+        }
+    }
 
     $beforeInsert() {
         this.created_at = new Date().toISOString().slice(0, 19).replace('T', ' ');
