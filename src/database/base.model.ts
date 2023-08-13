@@ -12,14 +12,18 @@ export class BaseModel extends Model {
 
     QueryBuilderType!: CustomQueryBuilder<this>;
     static QueryBuilder = CustomQueryBuilder;
-    
-    static queryBuilder(query: any) {
+
+    static query(...args: any) {
+        const query = super.query(...args);
         const request = (global as any).requestContext;
-        if(request?.tenant){
-            query.withSchema(request?.tenant)
+        const subdomains = request.subdomains
+        if(subdomains.length > 0){
+            query.withSchema(subdomains[0])
         }else{
             query.withSchema('public')
         }
+        
+        return query;
     }
 
     $beforeInsert() {

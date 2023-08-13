@@ -6,10 +6,12 @@ import { UsersModule } from 'src/users/users.module';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './jwt.strategy';
+import { TenantsModule } from 'src/tenants/tenants.module';
 
 @Module({
   imports: [
     UsersModule,
+    TenantsModule,
     PassportModule.register({
       defaultStrategy: 'jwt'
     }),

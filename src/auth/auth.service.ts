@@ -5,24 +5,31 @@ import * as bcrypt from 'bcrypt';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/Register.dto';
 import { ModelClass } from 'objection';
-import { UserModel } from 'src/users/user.model';
+import { TenantsService } from 'src/tenants/tenants.service';
+import { TenantModel } from 'src/tenants/tenant.model';
 
 @Injectable()
 export class AuthService {
   constructor(
-    @Inject('UserModel') private modelClass: ModelClass<UserModel>,
+    @Inject('TenantModel') private tenantModelClass: ModelClass<TenantModel>,
+    private tenantsService: TenantsService,
     private usersService: UsersService,
     private jwtService: JwtService
   ) {}
 
   async register(registerDto: RegisterDto) {
-    const user = await this.usersService.findByEmail(registerDto.email)
-    if(user){
-      throw new NotAcceptableException('Email already exists')
+    const tenant = await this.tenantsService.findByPrefix(registerDto.prefix)
+    if(tenant){
+      throw new NotAcceptableException('Company prefix already exists')
     }
-    const hash = bcrypt.hashSync(registerDto.password, 10);
 
-    return await this.modelClass.query().insert({ ...registerDto, password: hash });
+    await this.tenantModelClass.query().insert({name: registerDto.name, prefix: registerDto.prefix});
+
+    // const hash = bcrypt.hashSync(registerDto.password, 10);
+
+    // return await this.tenantModelClass.query().insert(registerDto);
+
+    return true
   }
 
   async login(loginDto: LoginDto) {

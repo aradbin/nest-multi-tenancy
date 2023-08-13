@@ -1,9 +1,11 @@
 import 'dotenv/config';
 import { Global, Module } from "@nestjs/common";
 import { UserModel } from "../users/user.model";
+import { PackageModel } from '../packages/package.model';
 import { Model, knexSnakeCaseMappers } from "objection";
 import Knex from 'knex';
-const models = [UserModel];
+import { TenantModel } from 'src/tenants/tenant.model';
+const models = [UserModel, TenantModel, PackageModel];
 
 const modelProviders = models.map(model => {
     return {

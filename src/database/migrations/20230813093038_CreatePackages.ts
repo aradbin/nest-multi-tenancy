@@ -1,14 +1,13 @@
 import { Knex } from "knex"
 
-const tableName = 'tenants'
+const tableName = 'packages'
 
 export async function up(knex: Knex) {
     return knex.schema.withSchema('public').createTable(tableName, table => {
       table.increments()
       table.string('name').nullable();
-      table.string('prefix').nullable();
-      table.string('contact').nullable();
-      table.text('address').nullable();
+      table.integer('duration').nullable();
+      table.float('price').nullable();
       table.timestamp('created_at').nullable()
       table.integer('created_by').nullable()
       table.timestamp('updated_at').nullable()
