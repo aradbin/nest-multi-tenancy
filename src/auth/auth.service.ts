@@ -1,35 +1,24 @@
-import { Inject, Injectable, NotAcceptableException, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/Register.dto';
-import { ModelClass } from 'objection';
 import { TenantsService } from 'src/tenants/tenants.service';
-import { TenantModel } from 'src/tenants/tenant.model';
+import { CreateTenantDto } from 'src/tenants/dto/create-tenant.dto';
 
 @Injectable()
 export class AuthService {
   constructor(
-    @Inject('TenantModel') private tenantModelClass: ModelClass<TenantModel>,
     private tenantsService: TenantsService,
     private usersService: UsersService,
     private jwtService: JwtService
   ) {}
 
   async register(registerDto: RegisterDto) {
-    const tenant = await this.tenantsService.findByPrefix(registerDto.prefix)
-    if(tenant){
-      throw new NotAcceptableException('Company prefix already exists')
-    }
-
-    await this.tenantModelClass.query().insert({name: registerDto.name, prefix: registerDto.prefix});
-
-    // const hash = bcrypt.hashSync(registerDto.password, 10);
-
-    // return await this.tenantModelClass.query().insert(registerDto);
-
-    return true
+    const createTenantDto: CreateTenantDto = { name: registerDto.name, prefix: registerDto.prefix, contact: registerDto.contact, address: registerDto.address, email: registerDto.email, password: registerDto.password, created_at: null, created_by: null }
+    
+    return await this.tenantsService.create(createTenantDto)
   }
 
   async login(loginDto: LoginDto) {

@@ -4,6 +4,9 @@ export class UserModel extends BaseModel {
   static tableName = 'users';
 
   id: number;
+  name: string;
   email: string;
+  username: string;
   password: string;
+  contact: string;
 }

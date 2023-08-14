@@ -16,11 +16,13 @@ export class BaseModel extends Model {
     static query(...args: any) {
         const query = super.query(...args);
         const request = (global as any).requestContext;
-        const subdomains = request.subdomains
-        if(subdomains.length > 0){
-            query.withSchema(subdomains[0])
-        }else{
-            query.withSchema('public')
+        if(request.route.path!=='/auth/register'){
+            const subdomains = request.subdomains
+            if(subdomains.length > 0){
+                query.withSchema(subdomains[0])
+            }else{
+                query.withSchema('public')
+            }
         }
         
         return query;

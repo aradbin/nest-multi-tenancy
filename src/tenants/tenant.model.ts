@@ -6,4 +6,6 @@ export class TenantModel extends BaseModel {
   id: number;
   name: string;
   prefix: string;
+  contact: string;
+  address: string;
 }
