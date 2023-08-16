@@ -1,9 +1,11 @@
-import { IsOptional, IsString } from "class-validator";
+import { IsEmail, IsNotEmpty, IsOptional, IsString } from "class-validator";
 
 export class RegisterDto {
+    @IsNotEmpty({ message: 'Company name is required' })
     @IsString()
     name: string;
 
+    @IsNotEmpty({ message: 'Company prefix is required' })
     @IsString()
     prefix: string;
 
@@ -15,9 +17,11 @@ export class RegisterDto {
     @IsString()
     address: string;
     
-    @IsString()
+    @IsNotEmpty({ message: 'Email is required' })
+    @IsEmail({},{ message: 'Please provide valid email address' })
     email: string;
 
+    @IsNotEmpty({ message: 'Password is required' })
     @IsString()
     password: string;
 }

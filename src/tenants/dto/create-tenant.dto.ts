@@ -1,11 +1,11 @@
-import { IsInt, IsOptional, IsString } from "class-validator";
+import { IsEmail, IsInt, IsNotEmpty, IsOptional, IsString } from "class-validator";
 
 export class CreateTenantDto {
-    @IsOptional()
+    @IsNotEmpty({ message: 'Company name is required' })
     @IsString()
     name: string;
     
-    @IsOptional()
+    @IsNotEmpty({ message: 'Company prefix is required' })
     @IsString()
     prefix: string;
 
@@ -17,9 +17,11 @@ export class CreateTenantDto {
     @IsString()
     address: string;
 
-    @IsString()
+    @IsNotEmpty({ message: 'Email is required' })
+    @IsEmail({},{ message: 'Please provide valid email address' })
     email: string;
 
+    @IsNotEmpty({ message: 'Password is required' })
     @IsString()
     password: string;
 

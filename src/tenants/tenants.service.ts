@@ -1,5 +1,5 @@
 import { Inject, Injectable, NotAcceptableException } from '@nestjs/common';
-import { ModelClass } from 'objection';
+import { Model, ModelClass } from 'objection';
 import { TenantModel } from './tenant.model';
 import { CreateTenantDto } from './dto/create-tenant.dto';
 import { UpdateTenantDto } from './dto/update-tenant.dto';
@@ -21,13 +21,44 @@ export class TenantsService {
       throw new NotAcceptableException('Company prefix already exists')
     }
 
-    tenant = await this.modelClass.query().insert({ name: createTenantDto.name, prefix: createTenantDto.prefix, contact: createTenantDto.contact, address: createTenantDto.address});
+    try {
+      await this.knex.transaction(async (trx) => {
+        tenant = await this.modelClass.query(trx).withSchema('public').insert({ name: createTenantDto.name, prefix: createTenantDto.prefix, contact: createTenantDto.contact, address: createTenantDto.address})
 
-    await this.knex.schema.createSchema(createTenantDto.prefix).createTableLike(`${createTenantDto.prefix}.users`,'demo.users')
+        await trx.raw(`CREATE SCHEMA IF NOT EXISTS ${createTenantDto.prefix}`)
 
-    const hash = bcrypt.hashSync(createTenantDto.password, 10);
+        await trx.schema.createTableLike(`${createTenantDto.prefix}.users`,'demo.users')
 
-    await this.userModelClass.query().withSchema(createTenantDto.prefix).insert({ name: createTenantDto.name, email: createTenantDto.email, password: hash, contact: createTenantDto.contact });
+        await trx.raw(`
+          CREATE SEQUENCE ${createTenantDto.prefix}.users_id_seq;
+          ALTER TABLE ${createTenantDto.prefix}.users
+          ALTER COLUMN id SET DEFAULT nextval('${createTenantDto.prefix}.users_id_seq'::regclass);
+        `)
+
+        // await trx.raw(`SELECT setval('${createTenantDto.prefix}.users_id_seq', 1, false);`)
+
+        const hash = bcrypt.hashSync(createTenantDto.password, 10)
+
+        await this.userModelClass.query(trx).withSchema(createTenantDto.prefix).insert({ name: createTenantDto.name, email: createTenantDto.email, password: hash, contact: createTenantDto.contact })
+
+        return tenant
+      })
+    } catch (error) {
+      throw error
+    }
+
+
+
+
+
+
+    // tenant = await this.modelClass.query().insert({ name: createTenantDto.name, prefix: createTenantDto.prefix, contact: createTenantDto.contact, address: createTenantDto.address});
+
+    // await this.knex.schema.createSchema(createTenantDto.prefix).createTableLike(`${createTenantDto.prefix}.users`,'demo.users')
+
+    // const hash = bcrypt.hashSync(createTenantDto.password, 10);
+
+    // await this.userModelClass.query().withSchema(createTenantDto.prefix).insert({ name: createTenantDto.name, email: createTenantDto.email, password: hash, contact: createTenantDto.contact });
 
     return tenant
   }
