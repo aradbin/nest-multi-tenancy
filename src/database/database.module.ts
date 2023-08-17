@@ -5,7 +5,8 @@ import { PackageModel } from '../packages/package.model';
 import { Model, knexSnakeCaseMappers } from "objection";
 import Knex from 'knex';
 import { TenantModel } from 'src/tenants/tenant.model';
-const models = [UserModel, TenantModel, PackageModel];
+import { SubscriptionModel } from 'src/subscriptions/subscription.model';
+const models = [UserModel, TenantModel, PackageModel, SubscriptionModel];
 
 const modelProviders = models.map(model => {
     return {

@@ -1,5 +1,5 @@
 import { Inject, Injectable, NotAcceptableException } from '@nestjs/common';
-import { Model, ModelClass } from 'objection';
+import { ModelClass } from 'objection';
 import { TenantModel } from './tenant.model';
 import { CreateTenantDto } from './dto/create-tenant.dto';
 import { UpdateTenantDto } from './dto/update-tenant.dto';
@@ -35,8 +35,6 @@ export class TenantsService {
           ALTER COLUMN id SET DEFAULT nextval('${createTenantDto.prefix}.users_id_seq'::regclass);
         `)
 
-        // await trx.raw(`SELECT setval('${createTenantDto.prefix}.users_id_seq', 1, false);`)
-
         const hash = bcrypt.hashSync(createTenantDto.password, 10)
 
         await this.userModelClass.query(trx).withSchema(createTenantDto.prefix).insert({ name: createTenantDto.name, email: createTenantDto.email, password: hash, contact: createTenantDto.contact })
@@ -46,19 +44,6 @@ export class TenantsService {
     } catch (error) {
       throw error
     }
-
-
-
-
-
-
-    // tenant = await this.modelClass.query().insert({ name: createTenantDto.name, prefix: createTenantDto.prefix, contact: createTenantDto.contact, address: createTenantDto.address});
-
-    // await this.knex.schema.createSchema(createTenantDto.prefix).createTableLike(`${createTenantDto.prefix}.users`,'demo.users')
-
-    // const hash = bcrypt.hashSync(createTenantDto.password, 10);
-
-    // await this.userModelClass.query().withSchema(createTenantDto.prefix).insert({ name: createTenantDto.name, email: createTenantDto.email, password: hash, contact: createTenantDto.contact });
 
     return tenant
   }
@@ -76,7 +61,7 @@ export class TenantsService {
   }
 
   async update(id: number, updateTenantDto: UpdateTenantDto) {
-    return await this.modelClass.query().findById(id).update(updateTenantDto)
+    // return await this.modelClass.query().findById(id).update(updateTenantDto)
   }
 
   async remove(id: number) {
