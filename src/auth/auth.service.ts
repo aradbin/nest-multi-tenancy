@@ -3,9 +3,9 @@ import { UsersService } from 'src/users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { LoginDto } from './dto/login.dto';
-import { RegisterDto } from './dto/Register.dto';
 import { TenantsService } from 'src/tenants/tenants.service';
 import { CreateTenantDto } from 'src/tenants/dto/create-tenant.dto';
+import { RegisterDto } from './dto/register.dto';
 
 @Injectable()
 export class AuthService {
@@ -16,7 +16,7 @@ export class AuthService {
   ) {}
 
   async register(registerDto: RegisterDto) {
-    const createTenantDto: CreateTenantDto = { name: registerDto.name, prefix: registerDto.prefix, contact: registerDto.contact, address: registerDto.address, email: registerDto.email, password: registerDto.password, created_at: null, created_by: null }
+    const createTenantDto: CreateTenantDto = { ...registerDto }
     
     return await this.tenantsService.create(createTenantDto)
   }

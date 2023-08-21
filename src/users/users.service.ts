@@ -17,6 +17,7 @@ export class UsersService {
       throw new NotAcceptableException('Email already exists')
     }
     const hash = bcrypt.hashSync(createUserDto.password, 10);
+    
     return await this.modelClass.query().insert({ ...createUserDto, password: hash });
   }
 
